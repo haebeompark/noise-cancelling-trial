@@ -37,7 +37,7 @@ def main():
     train_acc = simpleNN.getAccuracy(X_train, Y_train)
     test_acc = simpleNN.getAccuracy(X_test, Y_test)
     print ('train set Accuracy: %f' % train_acc + '%')
-    print ('train set Accuracy: %f' % test_acc + '%')
+    print ('test set Accuracy: %f' % test_acc + '%')
 
 
     # decision_boundary(lambda x: simpleNN.predict(x.T), X_train, Y_train)
