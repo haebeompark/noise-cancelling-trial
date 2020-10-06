@@ -15,13 +15,13 @@ class Vecto:
             X = X - item /2
             X = X * 2
             arr = np.append(arr, item, axis = 0)
-        #print(arr)
+        arr = np.delete(arr, 0, axis = 0)
         return arr
 
     @classmethod
     def unvectorization(cls, arr, count = 10):
         X = np.zeros((1,arr.shape[1]))
-        for i in range(count):
-            item = arr[count-i]
+        for i in range(0, count):
+            item = arr[count-i-1]
             X = (X + item) / 2
         return X
