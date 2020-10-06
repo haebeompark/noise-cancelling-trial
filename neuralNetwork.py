@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from vectorization import Vecto as vt
 np.random.seed(1)
 
@@ -35,7 +36,7 @@ def relu(x):
     return s
 
 class NeuralNetwork:
-    def __init__(self,layerDims, nSample):
+    def __init__(self, layerDims, nSample):
         '''
         학습할 네트워크.
 
@@ -105,24 +106,24 @@ class NeuralNetwork:
 
         return AL
 
-    def compute_cost(self, AL,Y, lambd=0.7):
+    # def compute_cost(self, AL,Y, lambd=0.7):
         
-        self.cache.update(Y=Y)
-        W1, W2, W3, W4, W5 = self.parameters["W1"], self.parameters["W2"], self.parameters["W3"], self.parameters["W4"], self.parameters["W5"]
+    #     self.cache.update(Y=Y)
+    #     W1, W2, W3, W4, W5 = self.parameters["W1"], self.parameters["W2"], self.parameters["W3"], self.parameters["W4"], self.parameters["W5"]
 
-        def replace_zero(prob):
-            result = np.where(prob > 0.000000002, prob, -20)
-            np.log(result, out=result, where=result > 0)
-            return result
+    #     def replace_zero(prob):
+    #         result = np.where(prob > 0.000000002, prob, -20)
+    #         np.log(result, out=result, where=result > 0)
+    #         return result
         
-        logprobs = -Y * replace_zero(AL) -(1-Y) * replace_zero(1-AL)
-        cost = (1/ self.nSample) * np.sum(logprobs) + (lambd/self.nSample)*(np.sum(W1)+np.sum(W2)+np.sum(W3)+np.sum(W4)+np.sum(W5))
+    #     logprobs = -Y * replace_zero(AL) -(1-Y) * replace_zero(1-AL)
+    #     cost = (1/ self.nSample) * np.sum(logprobs) + (lambd/self.nSample)*(np.sum(W1)+np.sum(W2)+np.sum(W3)+np.sum(W4)+np.sum(W5))
         
-        cost = float(np.squeeze(cost))  
+    #     cost = float(np.squeeze(cost))  
 
-        assert(isinstance(cost, float))
+    #     assert(isinstance(cost, float))
         
-        return cost
+    #     return cost
 
     def update_params(self, learning_rate=0.01, beta2=0.999, epsilon=1e-8):
         '''
@@ -232,7 +233,7 @@ class NeuralNetwork:
 
         return predictions
   
-    def training_with_regularization(self, X_train, Y_train, num_iterations, learning_rate):
+    def training_with_regularization(self, X_train, Y_train, num_iterations, learning_rate, show = True):
 
         ## 코딩시작
         for i in range(0, num_iterations):
@@ -244,8 +245,12 @@ class NeuralNetwork:
             self.update_params(learning_rate)
             
             if i % 100 ==0:
-                learning_rate = learning_rate * 0.9
-                print("Cost after iteration %i: %f" %(i,cost))
+                # learning_rate = learning_rate * 0.9
+                if show:
+                     print("Cost after iteration %i: %f" %(i,cost))
+        if show:
+            print("Cost after iteration %i: %f" %(i,cost))
+        return cost
 
     def getAccuracy(self, X, Y):
         ### prediction
@@ -254,3 +259,100 @@ class NeuralNetwork:
         Y_unvec = vt.unvectorization(Y)
 
         return (100 - float(np.abs(Y_unvec - predictions_unvec).sum()/(Y_unvec.size))*100)
+
+    @classmethod
+    def Builder(cls, nSample, count, numberOfHiddenLayers = 5):
+        array = [count*2 for i in range(numberOfHiddenLayers+2)]
+        array[0] = count
+        array[len(array)-1] = count
+        return NeuralNetwork(array, nSample)
+
+    @classmethod
+    def smallest(cls,a,b,c):
+        minimall = a
+        result = 0
+        if minimall > b:
+            result = 1
+            minimall = b
+        if minimall > c:
+            result = 2
+            minimall = c
+        return result
+
+
+    @classmethod
+    def autoBuilder(cls, X_train, Y_train, nSample, layerStart = 0,layerLimit = 17, developmentMode = False, settingRatio = 0.01):
+        forSetting = int(max(nSample * settingRatio, 1))
+        dataSample = X_train.shape[1] #데이터 수
+        X_train = X_train[:,0:forSetting]
+        Y_train = Y_train[:,0:forSetting]
+        count = X_train.shape[0] #파라미터 수
+        nSample = X_train.shape[1] #데이터 수
+        iterators = max(int(100000 / nSample), 10)    #0이 아니도록
+        numberOfHiddenLayers = layerStart
+        learning_rate = 0.01
+
+        def setHiddenLayers(nSample, layerLimit, count, iterators, lr, X_train, Y_train):
+            bestCost = 1e+8
+            result = 0
+            for hiddenLayers in range(layerStart, layerLimit+1):
+                trialNN = NeuralNetwork.Builder(nSample, count, hiddenLayers)
+                cost = trialNN.training_with_regularization( X_train, Y_train, iterators, learning_rate, show = developmentMode)
+                trialNN = None
+                if developmentMode:
+                    print("cost : ", cost, "hiddenLayers : ", hiddenLayers, "\n")
+                if cost/(hiddenLayers+5) > bestCost/(hiddenLayers+4):
+                    result = hiddenLayers-1
+                    if developmentMode:
+                        print("first break\n")
+                    break
+                else:
+                    bestCost = cost
+            return result
+        def setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, X_train, Y_train):
+            trialNN = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
+            cost = trialNN.training_with_regularization( X_train, Y_train, iterators, lr, show = developmentMode)
+            trialNN = None
+
+            for i in range(10):
+                r = random.random()
+                trialNNUp = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
+                trialNNDown = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
+                costUp = trialNNUp.training_with_regularization( X_train, Y_train, iterators, lr/r, show = developmentMode)
+                trialNNUp = None
+                costDown = trialNNDown.training_with_regularization( X_train, Y_train, iterators, lr*r, show = developmentMode)
+                trialNNDown = None
+                if developmentMode:
+                    print("cost : ", cost, "costUp : ", costUp, "costDown : ", costDown)
+                    print("lr : ", lr,", r : ", r, "\n")
+
+                case = NeuralNetwork.smallest(cost, costUp, costDown)
+                if case == 0:
+                    pass
+                elif case == 1:
+                    cost = costUp
+                    lr /= r
+                elif case == 2:
+                    cost = costDown
+                    lr *= r
+            if developmentMode:
+                print("second break\n")
+            return lr
+        ## hiddenLayer의 수를 먼저 정한뒤 learning_rate를 조절 -> 다시 hiddenLayer를 확정한다.
+        # hiddenLayer를 0부터 증가시키면서 cost가 늘어나는 순간 멈추고 확정시킨다.
+        lr = learning_rate
+        Changed = True
+
+        numberOfHiddenLayers = setHiddenLayers(nSample, layerLimit, count, iterators*3, lr, X_train, Y_train)
+        lr = setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, X_train, Y_train)
+        while Changed:
+            nOHL = setHiddenLayers(nSample, layerLimit, count, iterators, lr, X_train, Y_train)
+            lr_ = setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, X_train, Y_train)
+            Changed = (nOHL != numberOfHiddenLayers) or (lr_ != lr)
+            numberOfHiddenLayers = nOHL
+            lr = lr_
+        print(" ------------------ ")
+        print("   build Complete   ")
+        print(" ------------------ ")
+        print("lr = ", lr, "\nnumberOfHiddenLayers = ", numberOfHiddenLayers,"\n\n")
+        return [NeuralNetwork.Builder(dataSample, count, numberOfHiddenLayers), lr]
