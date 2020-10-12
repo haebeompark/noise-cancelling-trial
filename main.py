@@ -1,6 +1,7 @@
 from vectorization import Vecto as vt
 from neuralNetwork import NeuralNetwork
 from dataSet import dataSet
+from decision import Decision
 import numpy as np
 np.random.seed(1)
 def createSimpleSet(shape,nSample,count):
@@ -12,9 +13,12 @@ def createSimpleSet(shape,nSample,count):
 def main():
     np.random.seed(1)
     num_iterations = 1000
-    # learning_rate = 0.003
     count = 10
-    
+
+    userInput = input()
+    commands = Decision.userInput(userInput)
+    print(commands)
+    input()
     ### dataset loading 하기.
     trainSet = createSimpleSet(1,2000,count)
     testSet = createSimpleSet(1,400,count)
@@ -39,10 +43,6 @@ def main():
     test_acc = simpleNN.getAccuracy(testSet)
     print ('train set Accuracy: %f' % train_acc + '%')
     print ('test set Accuracy: %f' % test_acc + '%')
-
-
-    # decision_boundary(lambda x: simpleNN.predict(x.T), X_train, Y_train)
-    # decision_boundary(lambda x: simpleNN.predict(x.T), X_test, Y_test)
 
 if __name__=='__main__':
     main()
