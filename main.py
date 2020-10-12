@@ -1,7 +1,7 @@
 from vectorization import Vecto as vt
 from neuralNetwork import NeuralNetwork
 from dataSet import dataSet
-from decision import Decision
+from decision import Decision, command
 import numpy as np
 np.random.seed(1)
 def createSimpleSet(shape,nSample,count):
@@ -15,13 +15,22 @@ def main():
     num_iterations = 1000
     count = 10
 
-    userInput = input()
-    commands = Decision.userInput(userInput)
-    print(commands)
-    input()
+    while(True):
+        userInput = input()
+        cds = Decision.userInput(userInput)
+        commands = cds.commands
+        if cds.noErr:
+            first = commands[0]
+            second = commands[1]
+            third = commands[2]
+            if first == 0:  #createDataSet
+                if second == 0: #train
+                    trainSet = createSimpleSet(1,third,count)
+                elif second == 1: #test
+                    testSet = createSimpleSet(1,third,count)
+
     ### dataset loading 하기.
-    trainSet = createSimpleSet(1,2000,count)
-    testSet = createSimpleSet(1,400,count)
+
     # plt.title("Data distribution")
     # plt.scatter(X_train[0, :], X_train[1, :], c=Y_train[0,:], s=20, cmap=plt.cm.RdBu)
     # plt.show()
