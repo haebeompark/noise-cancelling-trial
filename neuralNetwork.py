@@ -91,8 +91,6 @@ class NeuralNetwork:
         Return:
             A23: network output
         '''
-
-        ## 코딩시작 
         parameters = self.parameters
         cache = {}
         cache['A0'] = X
@@ -107,34 +105,8 @@ class NeuralNetwork:
 
         return AL
 
-    # def compute_cost(self, AL,Y, lambd=0.7):
-        
-    #     self.cache.update(Y=Y)
-    #     W1, W2, W3, W4, W5 = self.parameters["W1"], self.parameters["W2"], self.parameters["W3"], self.parameters["W4"], self.parameters["W5"]
-
-    #     def replace_zero(prob):
-    #         result = np.where(prob > 0.000000002, prob, -20)
-    #         np.log(result, out=result, where=result > 0)
-    #         return result
-        
-    #     logprobs = -Y * replace_zero(AL) -(1-Y) * replace_zero(1-AL)
-    #     cost = (1/ self.nSample) * np.sum(logprobs) + (lambd/self.nSample)*(np.sum(W1)+np.sum(W2)+np.sum(W3)+np.sum(W4)+np.sum(W5))
-        
-    #     cost = float(np.squeeze(cost))  
-
-    #     assert(isinstance(cost, float))
-        
-    #     return cost
-
     def update_params(self, learning_rate=0.01, beta2=0.999, epsilon=1e-8):
-        '''
-        backpropagation을 통해 얻은 gradients를 update한다.
 
-        Arguments:
-            learning_rate:  학습할 learning rate
-
-        Return:
-        '''
         parameters = self.parameters
         grads = self.grads
         dims = int(len(parameters)/2)
@@ -150,16 +122,6 @@ class NeuralNetwork:
         return 
     
     def compute_cost_with_regularization(self, AL, Y, lambd=0.7):
-        '''
-        cross-entropy loss에 regularization term을 이용하여 cost를 구한다.
-
-        Arguments:
-            A3 : network 결과값
-            Y  : 정답 label(groud truth)
-            lambd : 람다 값. 
-        Return:
-            cost
-        '''
 
         self.cache.update(Y=Y)
         W = []
@@ -176,22 +138,12 @@ class NeuralNetwork:
         logprobs = -Y * replace_zero(AL) -(1-Y) * replace_zero(1-AL)
         cost = (1/ self.nSample) * np.sum(logprobs) + (lambd/self.nSample)*(sum)
 
-        
         cost = float(np.squeeze(cost))  
-
         assert(isinstance(cost, float))
         
         return cost
 
     def backward_with_regularization(self,lambd=0.7):
-        '''
-        regularization term이 추가된 backward propagation.
-
-        Arguments:
-            lambd: 
-
-        Return:
-        '''
         # regularization term이 추가된 cost에서 back-propagation을 진행, grads update
         parameters = self.parameters
         cache = self.cache
@@ -218,7 +170,6 @@ class NeuralNetwork:
         for l in range(1,1+int(len(parameters)/2)):
             grads["dW"+str(l)] = self.grads["dW"+str(l)] + (lambd/self.nSample)*(np.sum(self.parameters["W"+str(l)]))
         self.grads.update(grads)
-        ## 코딩
         return
     
     def predict(self,X):
@@ -236,7 +187,6 @@ class NeuralNetwork:
   
     def training_with_regularization(self, trainSet, num_iterations, learning_rate, show = True):
 
-        ## 코딩시작
         for i in range(0, num_iterations):
             AL = self.forward(trainSet.X)               ##forward propagation 하기.
             cost = self.compute_cost_with_regularization(AL,trainSet.Y)             ## cost function을 이용해 cost 구하기.
@@ -279,7 +229,6 @@ class NeuralNetwork:
             result = 2
             minimall = c
         return result
-
 
     @classmethod
     def autoBuilder(cls, trainSet, nSample, layerStart = 0,layerLimit = 17, developmentMode = False, settingRatio = 0.01):
