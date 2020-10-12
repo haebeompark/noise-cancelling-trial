@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from dataSet import dataSet
 from vectorization import Vecto as vt
 np.random.seed(1)
 
@@ -233,12 +234,12 @@ class NeuralNetwork:
 
         return predictions
   
-    def training_with_regularization(self, X_train, Y_train, num_iterations, learning_rate, show = True):
+    def training_with_regularization(self, trainSet, num_iterations, learning_rate, show = True):
 
         ## 코딩시작
         for i in range(0, num_iterations):
-            AL = self.forward(X_train)               ##forward propagation 하기.
-            cost = self.compute_cost_with_regularization(AL,Y_train)             ## cost function을 이용해 cost 구하기.
+            AL = self.forward(trainSet.X)               ##forward propagation 하기.
+            cost = self.compute_cost_with_regularization(AL,trainSet.Y)             ## cost function을 이용해 cost 구하기.
             pass                ## 위에 만든 함수를 이용하여 backpropagation 진행
             self.backward_with_regularization()
             pass                ## 위에 만든 함수를 이용하여 network의 weight update하기.
@@ -252,11 +253,11 @@ class NeuralNetwork:
             print("Cost after iteration %i: %f" %(i,cost))
         return cost
 
-    def getAccuracy(self, X, Y):
+    def getAccuracy(self, dataSet):
         ### prediction
-        predictions = self.predict(X)
+        predictions = self.predict(dataSet.X)
         predictions_unvec = vt.unvectorization(predictions)
-        Y_unvec = vt.unvectorization(Y)
+        Y_unvec = vt.unvectorization(dataSet.Y)
 
         return (100 - float(np.abs(Y_unvec - predictions_unvec).sum()/(Y_unvec.size))*100)
 
@@ -281,23 +282,30 @@ class NeuralNetwork:
 
 
     @classmethod
-    def autoBuilder(cls, X_train, Y_train, nSample, layerStart = 0,layerLimit = 17, developmentMode = False, settingRatio = 0.01):
-        forSetting = int(max(nSample * settingRatio, 1))
-        dataSample = X_train.shape[1] #데이터 수
-        X_train = X_train[:,0:forSetting]
-        Y_train = Y_train[:,0:forSetting]
-        count = X_train.shape[0] #파라미터 수
-        nSample = X_train.shape[1] #데이터 수
-        iterators = max(int(100000 / nSample), 10)    #0이 아니도록
+    def autoBuilder(cls, trainSet, nSample, layerStart = 0,layerLimit = 17, developmentMode = False, settingRatio = 0.01):
+        print("Auto Builder -> build option : ")
+        print("  | layerStart = ", layerStart)
+        print("  | layerLimit = ", layerLimit)
+        print("  | developMod = ",developmentMode)
+        print("  | ratio      = ", settingRatio)
+        print("  | nSample    = ", nSample)
+        print("Auto Builder -> build Start")
+        forSetting = int(max(nSample * settingRatio, 50))
+        dataSample = trainSet.X.shape[1] #데이터 수
+        buildSet = trainSet.sliceOf(forSetting)
+        count = buildSet.X.shape[0] #파라미터 수
+        nSample = buildSet.X.shape[1] #데이터 수
+        iterators = max(int(1000000 / nSample), 10)    #0이 아니도록\
+        iterators = min(iterators, 1000)
         numberOfHiddenLayers = layerStart
         learning_rate = 0.01
 
-        def setHiddenLayers(nSample, layerLimit, count, iterators, lr, X_train, Y_train):
+        def setHiddenLayers(nSample, layerLimit, count, iterators, lr, buildSet):
             bestCost = 1e+8
             result = 0
             for hiddenLayers in range(layerStart, layerLimit+1):
                 trialNN = NeuralNetwork.Builder(nSample, count, hiddenLayers)
-                cost = trialNN.training_with_regularization( X_train, Y_train, iterators, learning_rate, show = developmentMode)
+                cost = trialNN.training_with_regularization( buildSet, iterators, learning_rate, show = developmentMode)
                 trialNN = None
                 if developmentMode:
                     print("cost : ", cost, "hiddenLayers : ", hiddenLayers, "\n")
@@ -309,18 +317,18 @@ class NeuralNetwork:
                 else:
                     bestCost = cost
             return result
-        def setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, X_train, Y_train):
+        def setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, buildSet):
             trialNN = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
-            cost = trialNN.training_with_regularization( X_train, Y_train, iterators, lr, show = developmentMode)
+            cost = trialNN.training_with_regularization( buildSet, iterators, lr, show = developmentMode)
             trialNN = None
 
             for i in range(10):
                 r = random.random()
                 trialNNUp = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
                 trialNNDown = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
-                costUp = trialNNUp.training_with_regularization( X_train, Y_train, iterators, lr/r, show = developmentMode)
+                costUp = trialNNUp.training_with_regularization( buildSet, iterators, lr/r, show = developmentMode)
                 trialNNUp = None
-                costDown = trialNNDown.training_with_regularization( X_train, Y_train, iterators, lr*r, show = developmentMode)
+                costDown = trialNNDown.training_with_regularization( buildSet, iterators, lr*r, show = developmentMode)
                 trialNNDown = None
                 if developmentMode:
                     print("cost : ", cost, "costUp : ", costUp, "costDown : ", costDown)
@@ -343,12 +351,16 @@ class NeuralNetwork:
         lr = learning_rate
         Changed = True
 
-        numberOfHiddenLayers = setHiddenLayers(nSample, layerLimit, count, iterators*3, lr, X_train, Y_train)
-        lr = setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, X_train, Y_train)
+        numberOfHiddenLayers = setHiddenLayers(nSample, layerLimit, count, iterators*3, lr, buildSet)
+        lr = setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, buildSet)
+        cycle = 0
         while Changed:
-            nOHL = setHiddenLayers(nSample, layerLimit, count, iterators, lr, X_train, Y_train)
-            lr_ = setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, X_train, Y_train)
+            nOHL = setHiddenLayers(nSample, layerLimit, count, iterators, lr, buildSet)
+            lr_ = setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, buildSet)
             Changed = (nOHL != numberOfHiddenLayers) or (lr_ != lr)
+            if Changed:
+                cycle += 1
+                print("Auto Builder -> NN updated ", cycle)
             numberOfHiddenLayers = nOHL
             lr = lr_
         print(" ------------------ ")
