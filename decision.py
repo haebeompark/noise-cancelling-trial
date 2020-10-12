@@ -23,14 +23,16 @@ class Decision:
 
     @classmethod
     def _dataSet(cls,array_input):
+        thirdCase = -1
         if len(array_input) < 3:
             cls.errorOccur("It is short command","type int only (what > 0) ")
-        try:
-            thirdCase = int(array_input[2])
-            if thirdCase < 1:
-                cls.errorOccur(thirdCase,"type int only (what > 0) ")
-        except:
-            cls.errorOccur(array_input[2],"type int only (what > 0) ")
+        else:
+            try:
+                thirdCase = int(array_input[2])
+                if thirdCase < 1:
+                    cls.errorOccur(thirdCase,"type int only (what > 0) ")
+            except:
+                cls.errorOccur(array_input[2],"type int only (what > 0) ")
         return thirdCase
 
     @classmethod
@@ -47,6 +49,34 @@ class Decision:
             return command([secondCase, thirdCase])
 
     @classmethod
+    def _autoBuild(cls,array_input):
+        cds = command([])
+        if len(array_input) == 1:
+            pass
+        else:
+            string_input = array_input[1]
+            try:
+                int_input = int(string_input)
+                if int_input < 0:
+                    cls.errorOccur(int_input,"type int only (what >= 0) ")
+                else:
+                    cds._extend(command([int_input]))
+            except:
+                cls.errorOccur(string_input,"type int only (what >= 0) ")
+
+        if len(array_input) > 2:
+            string_input = array_input[2]
+            try:
+                int_input = int(string_input)
+                if int_input < 0:
+                    cls.errorOccur(int_input,"type int only (what >= 0) ")
+                else:
+                    cds._extend(command([int_input]))
+            except:
+                cls.errorOccur(string_input,"type int only (what >= 0) ")
+        return cds
+
+    @classmethod
     def userInput(cls,string_input):
         cls.result.noErr = True
         array_input = string_input.strip().split()
@@ -58,10 +88,14 @@ class Decision:
         cls.result.command = firstCase
 
         if firstCase == 0:
-            try:
-                cls.result._extend(cls._createDataSet(array_input))
-            except:
-                print("  err : UNKNOWN")
-                cls.result.noErr = False
+            secondCase = cls._createDataSet(array_input)
+            
 
+        elif firstCase == 1:
+            secondCase = cls._autoBuild(array_input)
+        try:
+            cls.result._extend(secondCase)
+        except:
+            print("  err : UNKNOWN")
+            cls.result.noErr = False
         return cls.result
