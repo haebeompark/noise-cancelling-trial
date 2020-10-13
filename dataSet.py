@@ -1,3 +1,5 @@
+import numpy as np
+from vectorization import Vecto as vt
 class dataSet:
     X = None
     Y = None
@@ -11,3 +13,10 @@ class dataSet:
     def sliceDataSet(self, forSetting):
         self.X = self.X[:,0:forSetting]
         self.Y = self.Y[:,0:forSetting]
+
+    @classmethod
+    def createSimpleSet(cls,shape,nSample,count):
+        X = np.random.rand(shape,nSample) #(파라미터 수, 데이터 수)
+        Y = vt.vectorization(np.sin(X * np.pi),count)
+        X = vt.vectorization(X,count)
+        return dataSet(X,Y)

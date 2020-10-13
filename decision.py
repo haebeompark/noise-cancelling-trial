@@ -15,7 +15,7 @@ class Decision:
         cls.result.noErr = False
     @classmethod
     def _firstCase(cls,string_input): 
-        return {'createDataSet': 0, 'autoBuild': 1 }.get(string_input, -1)
+        return {'createDataSet': 0, 'autoBuild': 1 , 'model' : 2}.get(string_input, -1)
 
     @classmethod
     def _secondCase(cls,string_input):
@@ -77,6 +77,15 @@ class Decision:
         return cds
 
     @classmethod
+    def _model(cls,array_input):
+        cds = command([])
+        if len(array_input) < 2:
+            cls.errorOccur("It is short command","train, test")
+        else:
+            cds.commands = [cls._secondCase(array_input[1])]
+        return cds
+
+    @classmethod
     def userInput(cls,string_input):
         cls.result.noErr = True
         array_input = string_input.strip().split()
@@ -84,7 +93,7 @@ class Decision:
         cls.result.commands = [firstCase]
 
         if firstCase < 0:
-            cls.errorOccur(array_input[0], "createDataSet, autoBuild")
+            cls.errorOccur(array_input[0], "createDataSet, autoBuild, model")
         cls.result.command = firstCase
 
         if firstCase == 0:
@@ -93,6 +102,9 @@ class Decision:
 
         elif firstCase == 1:
             secondCase = cls._autoBuild(array_input)
+
+        elif firstCase == 2:
+            secondCase = cls._model(array_input)
         try:
             cls.result._extend(secondCase)
         except:

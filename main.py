@@ -4,12 +4,6 @@ from dataSet import dataSet
 from decision import Decision, command
 import numpy as np
 np.random.seed(1)
-def createSimpleSet(shape,nSample,count):
-    X = np.random.rand(shape,nSample) #(파라미터 수, 데이터 수)
-    Y = vt.vectorization(np.sin(X * np.pi),count)
-    X = vt.vectorization(X,count)
-    return dataSet(X,Y)
-
 def main():
     np.random.seed(1)
     num_iterations = 1000
@@ -22,6 +16,8 @@ def main():
         userInput = input()
         cds = Decision.userInput(userInput)
         commands = cds.commands
+        learning_rate = 0
+        simpleNN = 0
         # print(cds.noErr)
         # print(commands)
         if cds.noErr:
@@ -30,15 +26,15 @@ def main():
                 second = commands[1]
                 third = commands[2]
                 if second == 0: #train
-                    trainSet = createSimpleSet(1,third,count)
+                    trainSet = dataSet.createSimpleSet(1,third,count)
                     nSample = trainSet.X.shape[1]  #batch크기 또는 train set 수
                 elif second == 1: #test
-                    testSet = createSimpleSet(1,third,count)
+                    testSet = dataSet.createSimpleSet(1,third,count)
                
                 print("  | create datsSet complete ")
                 print("  | nSample = ", third)
 
-            elif first == 1:  #createDataSet
+            elif first == 1:  #autoBuild
                 if len(commands) ==1:
                     layerStart = 0
                     layerLimit = 8
@@ -57,6 +53,28 @@ def main():
                     print("  error : please load trainSet first")
                     print("  or create dataSet | use command   createDataSet")
 
+            elif first == 2:  #model
+                if len(commands) > 1:
+                    second = commands[1]
+                    if second == 0: #train
+                        if (learning_rate != 0) and (simpleNN != 0):
+                            simpleNN.training_with_regularization(trainSet, num_iterations, learning_rate)
+                            train_acc = simpleNN.getAccuracy(trainSet)
+                            test_acc = simpleNN.getAccuracy(testSet)
+                            print ('train set Accuracy: %f' % train_acc + '%')
+                            print ('test set Accuracy: %f' % test_acc + '%')
+                        else:
+                            print("  error : please build NN first")
+                            print("  | use command   autoBuild")
+                    elif second == 1: #test
+                        if (simpleNN != 0):
+                            train_acc = simpleNN.getAccuracy(trainSet)
+                            test_acc = simpleNN.getAccuracy(testSet)
+                            print ('train set Accuracy: %f' % train_acc + '%')
+                            print ('test set Accuracy: %f' % test_acc + '%')
+                        else:
+                            print("  error : please build NN first")
+                            print("  | use command   autoBuild")
     ### dataset loading 하기.
 
     # plt.title("Data distribution")
@@ -64,15 +82,6 @@ def main():
     # plt.show()
 
     # simpleNN = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers = 1)
-    
-    ### training
-    simpleNN.training_with_regularization(trainSet, num_iterations, learning_rate)
-
-    ### prediction
-    train_acc = simpleNN.getAccuracy(trainSet)
-    test_acc = simpleNN.getAccuracy(testSet)
-    print ('train set Accuracy: %f' % train_acc + '%')
-    print ('test set Accuracy: %f' % test_acc + '%')
 
 if __name__=='__main__':
     main()
