@@ -45,3 +45,4 @@ https://m.blog.naver.com/PostView.nhn?blogId=takion7&logNo=221660937266&proxyRef
 https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.wavfile.write.html - wav파일읽기 numpy method
 https://stackoverflow.com/questions/16778878/python-write-a-wav-file-into-numpy-float-array
 https://stackoverflow.com/questions/51079048/scipy-io-wavfile-write-no-sound
+https://banana-media-lab.tistory.com/entry/Librosa-python-library%EB%A1%9C-%EC%9D%8C%EC%84%B1%ED%8C%8C%EC%9D%BC-%EB%B6%84%EC%84%9D%ED%95%98%EA%B8%B0

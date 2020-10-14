@@ -244,7 +244,7 @@ class NeuralNetwork:
         buildSet = trainSet.sliceOf(forSetting)
         count = buildSet.X.shape[0] #파라미터 수
         nSample = buildSet.X.shape[1] #데이터 수
-        iterators = max(int(1000000 / nSample), 10)    #0이 아니도록\
+        iterators = max(int(10000000 / nSample*count), 10)    #0이 아니도록\
         iterators = min(iterators, 1000)
         numberOfHiddenLayers = layerStart
         learning_rate = 0.01

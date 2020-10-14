@@ -7,7 +7,7 @@ np.random.seed(1)
 def main():
     np.random.seed(1)
     num_iterations = 1000
-    count = 10
+    count = 10  # default
     nSample = 0
     layerStart = 0
     layerLimit = 8
@@ -23,6 +23,7 @@ def main():
         if cds.noErr:
             first = commands[0]
             if first == 0:  #createDataSet
+                count = 10
                 second = commands[1]
                 third = commands[2]
                 if second == 0: #train
@@ -45,7 +46,7 @@ def main():
                     layerStart = commands[1]
                     layerLimit = commands[2]
                 if nSample > 0:
-                    package = NeuralNetwork.autoBuilder(trainSet, nSample, layerStart = 0, layerLimit = 8, developmentMode=False)
+                    package = NeuralNetwork.autoBuilder(trainSet, nSample, layerStart = 0, layerLimit = 8, developmentMode=True)
                     # autoBuilder가 learning rate와 hiddenLayer의 수를 알아서 정해준다. 작업이 오래 걸릴 수 있음.
                     simpleNN = package[0]
                     learning_rate = package[1]
@@ -60,21 +61,35 @@ def main():
                         if (learning_rate != 0) and (simpleNN != 0):
                             simpleNN.training_with_regularization(trainSet, num_iterations, learning_rate)
                             train_acc = simpleNN.getAccuracy(trainSet)
-                            test_acc = simpleNN.getAccuracy(testSet)
                             print ('train set Accuracy: %f' % train_acc + '%')
-                            print ('test set Accuracy: %f' % test_acc + '%')
                         else:
                             print("  error : please build NN first")
                             print("  | use command   autoBuild")
                     elif second == 1: #test
                         if (simpleNN != 0):
-                            train_acc = simpleNN.getAccuracy(trainSet)
-                            test_acc = simpleNN.getAccuracy(testSet)
-                            print ('train set Accuracy: %f' % train_acc + '%')
-                            print ('test set Accuracy: %f' % test_acc + '%')
+                            try:
+                                train_acc = simpleNN.getAccuracy(trainSet)
+                                test_acc = simpleNN.getAccuracy(testSet)
+                                print ('train set Accuracy: %f' % train_acc + '%')
+                                print ('test set Accuracy: %f' % test_acc + '%')
+                            except:
+                                print("  error : please load test set")
                         else:
                             print("  error : please build NN first")
                             print("  | use command   autoBuild")
+
+            elif first == 3:  #loadDataSet
+                second = commands[1]
+                third = commands[2]
+                count = 1000
+                if second == 0: #train
+                    trainSet = dataSet.loadDataSet(count)
+                    nSample = trainSet.X.shape[1]  #batch크기 또는 train set 수
+                elif second == 1: #test
+                    testSet = dataSet.loadDataSet(count)
+               
+                print("  | load datsSet complete ")
+                print("  | nSample = ", nSample)
     ### dataset loading 하기.
 
     # plt.title("Data distribution")

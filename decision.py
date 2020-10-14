@@ -15,7 +15,7 @@ class Decision:
         cls.result.noErr = False
     @classmethod
     def _firstCase(cls,string_input): 
-        return {'createDataSet': 0, 'autoBuild': 1 , 'model' : 2}.get(string_input, -1)
+        return {'createDataSet': 0, 'autoBuild': 1 , 'model' : 2, 'loadDataSet' : 3}.get(string_input, -1)
 
     @classmethod
     def _secondCase(cls,string_input):
@@ -47,6 +47,10 @@ class Decision:
             else:
                 thirdCase = cls._dataSet(array_input)
             return command([secondCase, thirdCase])
+
+    @classmethod
+    def _loadDataSet(cls,array_input):
+        return cls._createDataSet(array_input)
 
     @classmethod
     def _autoBuild(cls,array_input):
@@ -88,26 +92,31 @@ class Decision:
     @classmethod
     def userInput(cls,string_input):
         cls.result.noErr = True
-        array_input = string_input.strip().split()
-        firstCase = cls._firstCase(array_input[0])
-        cls.result.commands = [firstCase]
+        if len(string_input) > 0:
+            array_input = string_input.strip().split()
+            firstCase = cls._firstCase(array_input[0])
+            cls.result.commands = [firstCase]
 
-        if firstCase < 0:
-            cls.errorOccur(array_input[0], "createDataSet, autoBuild, model")
-        cls.result.command = firstCase
+            if firstCase < 0:
+                cls.errorOccur(array_input[0], "createDataSet, autoBuild, model, loadDataSet")
+            cls.result.command = firstCase
 
-        if firstCase == 0:
-            secondCase = cls._createDataSet(array_input)
-            
+            if firstCase == 0:
+                secondCase = cls._createDataSet(array_input)
 
-        elif firstCase == 1:
-            secondCase = cls._autoBuild(array_input)
+            elif firstCase == 1:
+                secondCase = cls._autoBuild(array_input)
 
-        elif firstCase == 2:
-            secondCase = cls._model(array_input)
-        try:
-            cls.result._extend(secondCase)
-        except:
-            print("  err : UNKNOWN")
-            cls.result.noErr = False
+            elif firstCase == 2:
+                secondCase = cls._model(array_input)
+
+            elif firstCase == 3:
+                secondCase = cls._loadDataSet(array_input)
+
+            try:
+                cls.result._extend(secondCase)
+            except:
+                print("  err : UNKNOWN")
+                cls.result.noErr = False
+        else:   cls.errorOccur("", "createDataSet, autoBuild, model, loadDataSet")
         return cls.result

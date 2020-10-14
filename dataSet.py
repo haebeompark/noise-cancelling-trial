@@ -1,5 +1,7 @@
 import numpy as np
 from vectorization import Vecto as vt
+from wavIO import WavIO as WIO
+
 class dataSet:
     X = None
     Y = None
@@ -19,4 +21,10 @@ class dataSet:
         X = np.random.rand(shape,nSample) #(파라미터 수, 데이터 수)
         Y = vt.vectorization(np.sin(X * np.pi),count)
         X = vt.vectorization(X,count)
+        return dataSet(X,Y)
+
+    @classmethod
+    def loadDataSet(cls,count):
+        X = WIO.load(count) #(파라미터 수, 데이터 수)
+        Y = X
         return dataSet(X,Y)
