@@ -46,3 +46,7 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.wavfile.write.html
 https://stackoverflow.com/questions/16778878/python-write-a-wav-file-into-numpy-float-array
 https://stackoverflow.com/questions/51079048/scipy-io-wavfile-write-no-sound
 https://banana-media-lab.tistory.com/entry/Librosa-python-library%EB%A1%9C-%EC%9D%8C%EC%84%B1%ED%8C%8C%EC%9D%BC-%EB%B6%84%EC%84%9D%ED%95%98%EA%B8%B0
+https://greeksharifa.github.io/%ED%8C%8C%EC%9D%B4%EC%8D%AC/2019/12/16/numba/ - Numba
+https://gurujung.github.io/dev/numba_user_jit/ -Numba
+
+https://yonghyuc.wordpress.com/2019/08/06/pytorch-cuda-gpu-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/ - pyTorch

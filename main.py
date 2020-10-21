@@ -2,9 +2,20 @@ from vectorization import Vecto as vt
 from neuralNetwork import NeuralNetwork
 from dataSet import dataSet
 from decision import Decision, command
+
 import numpy as np
+import torch
 np.random.seed(1)
+def gpuInit():
+    cuda = torch.device('cuda')
+    print("cuda available : ", torch.cuda.is_available())
+    print("cuda current device : ", torch.cuda.current_device())
+    print("cuda device count : ", torch.cuda.device_count())
+    print("cuda device name : ", torch.cuda.get_device_name(0))
+    return cuda
+    
 def main():
+    cuda = gpuInit()
     np.random.seed(1)
     num_iterations = 1000
     count = 10  # default
@@ -98,5 +109,5 @@ def main():
 
     # simpleNN = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers = 1)
 
-if __name__=='__main__':
+if __name__=='__main__':    
     main()
