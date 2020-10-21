@@ -122,7 +122,6 @@ class NeuralNetwork:
         return 
     
     def compute_cost_with_regularization(self, AL, Y, lambd=0.7):
-
         self.cache.update(Y=Y)
         W = []
         sum = 0.0
@@ -212,10 +211,10 @@ class NeuralNetwork:
         return (100 - float(np.abs(Y_unvec - predictions_unvec).sum()/(Y_unvec.size))*100)
 
     @classmethod
-    def Builder(cls, nSample, count, numberOfHiddenLayers = 5):
+    def Builder(cls, nSample, count,output = 1, numberOfHiddenLayers = 5):
         array = [count*2 for i in range(numberOfHiddenLayers+2)]
         array[0] = count
-        array[len(array)-1] = count
+        array[len(array)-1] = output
         return NeuralNetwork(array, nSample)
 
     @classmethod
@@ -243,8 +242,9 @@ class NeuralNetwork:
         dataSample = trainSet.X.shape[1] #데이터 수
         buildSet = trainSet.sliceOf(forSetting)
         count = buildSet.X.shape[0] #파라미터 수
+        output = buildSet.Y.shape[0]
         nSample = buildSet.X.shape[1] #데이터 수
-        iterators = max(int(10000000 / nSample*count), 10)    #0이 아니도록\
+        iterators = max(int(20000000 / nSample*(count+output)), 10)    #0이 아니도록\
         iterators = min(iterators, 1000)
         numberOfHiddenLayers = layerStart
         learning_rate = 0.01
@@ -253,7 +253,7 @@ class NeuralNetwork:
             bestCost = 1e+8
             result = 0
             for hiddenLayers in range(layerStart, layerLimit+1):
-                trialNN = NeuralNetwork.Builder(nSample, count, hiddenLayers)
+                trialNN = NeuralNetwork.Builder(nSample, count, output = output, numberOfHiddenLayers = hiddenLayers)
                 cost = trialNN.training_with_regularization( buildSet, iterators, learning_rate, show = developmentMode)
                 trialNN = None
                 if developmentMode:
@@ -267,14 +267,14 @@ class NeuralNetwork:
                     bestCost = cost
             return result
         def setLearningRate(nSample, numberOfHiddenLayers, count, iterators, lr, buildSet):
-            trialNN = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
+            trialNN = NeuralNetwork.Builder(nSample, count, output = output, numberOfHiddenLayers = numberOfHiddenLayers)
             cost = trialNN.training_with_regularization( buildSet, iterators, lr, show = developmentMode)
             trialNN = None
 
             for i in range(10):
                 r = random.random()
-                trialNNUp = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
-                trialNNDown = NeuralNetwork.Builder(nSample, count, numberOfHiddenLayers)
+                trialNNUp = NeuralNetwork.Builder(nSample, count, output = output, numberOfHiddenLayers = numberOfHiddenLayers)
+                trialNNDown = NeuralNetwork.Builder(nSample, count, output = output, numberOfHiddenLayers = numberOfHiddenLayers)
                 costUp = trialNNUp.training_with_regularization( buildSet, iterators, lr/r, show = developmentMode)
                 trialNNUp = None
                 costDown = trialNNDown.training_with_regularization( buildSet, iterators, lr*r, show = developmentMode)
@@ -316,4 +316,4 @@ class NeuralNetwork:
         print("   build Complete   ")
         print(" ------------------ ")
         print("lr = ", lr, "\nnumberOfHiddenLayers = ", numberOfHiddenLayers,"\n\n")
-        return [NeuralNetwork.Builder(dataSample, count, numberOfHiddenLayers), lr]
+        return [NeuralNetwork.Builder(dataSample, count, numberOfHiddenLayers, output= output), lr]

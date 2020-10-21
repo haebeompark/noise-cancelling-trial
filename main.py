@@ -92,7 +92,7 @@ def main():
             elif first == 3:  #loadDataSet
                 second = commands[1]
                 third = commands[2]
-                count = 1000
+                count = 100
                 if second == 0: #train
                     trainSet = dataSet.loadDataSet(count)
                     nSample = trainSet.X.shape[1]  #batch크기 또는 train set 수

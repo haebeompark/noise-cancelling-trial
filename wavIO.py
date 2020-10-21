@@ -17,10 +17,4 @@ class WavIO:
         zeros = np.zeros((length - len(x) % length))
         x = np.append(x,zeros)
         x = np.reshape(x,(length,int(len(x) / length)))
-        print(x.shape)
-        vector = vt.vectorization(x,count=count)
-        print(vector.shape, vector)
-        unvec = vt.unvectorization(vector,count=count)
-        print(np.shape(unvec))
-        print("data load success, data shape = ",x.shape)
         return x

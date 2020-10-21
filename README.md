@@ -50,3 +50,53 @@ https://greeksharifa.github.io/%ED%8C%8C%EC%9D%B4%EC%8D%AC/2019/12/16/numba/ - N
 https://gurujung.github.io/dev/numba_user_jit/ -Numba
 
 https://yonghyuc.wordpress.com/2019/08/06/pytorch-cuda-gpu-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/ - pyTorch
+https://mc.ai/pytorch%EB%A1%9C-%EB%94%A5%EB%9F%AC%EB%8B%9D%ED%95%98%EA%B8%B0-cnn/ - pyTorch
+
+
+## 실행
+main.py를 실행해서 terminal에서 아래 문자열을 입력하며 진행한다.
+### create Simple data
+
+```
+createDataSet train 1000
+```
+0~1값을 갖는 train set X가 1000개 생성되고 X의 Sin값으로 Y를 생성한다.
+
+```
+createDataSet test 100
+```
+test set으로서 생성한다.
+
+### autoBuild
+```
+autoBuild
+```
+learning rate와 hiddenLayer수를 적절히 설정하도록 하는 builder
+무작위성 탐색과 느린반복 때문에 실행할 때 마다 다른값을 가지며 시간이 오래걸린다.
+-> 이미 최적의 lr과 hiddenLayer를 찾았으면 코드를 수정해서 그 값으로 Build하면 됨.
+
+>> 너무느려서 개선필요함
+
+### loadDataSet
+```
+loadDataSet train 1000
+```
+wav파일을 sampling한 것을 X, vectorization을 한 값을 Y로 trainSet을 생성한다.
+
+```
+loadDataSet test 100
+```
+testSet으로서 load
+
+### model
+```
+model train
+```
+build된 신경망으로 학습진행
+정확도를 내놓는다.
+
+```
+model test
+```
+학습된 신경망으로부터 테스트
+testSet의 정확도를 내놓는다.

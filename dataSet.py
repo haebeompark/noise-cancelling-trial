@@ -26,5 +26,6 @@ class dataSet:
     @classmethod
     def loadDataSet(cls,count):
         X = WIO.load(count) #(파라미터 수, 데이터 수)
-        Y = X
+        Y = vt.vectorization(X,count=10)
+        print("data load success, data shape = ",X.shape, Y.shape)
         return dataSet(X,Y)
