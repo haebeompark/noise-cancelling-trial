@@ -58,7 +58,7 @@ def main():
                     layerStart = commands[1]
                     layerLimit = commands[2]
                 if nSample > 0:
-                    package = NeuralNetwork.autoBuilder(trainSet, nSample, layerStart = 0, layerLimit = 0, developmentMode=True)
+                    package = NeuralNetwork.autoBuilder(trainSet, nSample, layerStart = 0, layerLimit = 8, developmentMode=True)
                     # autoBuilder가 learning rate와 hiddenLayer의 수를 알아서 정해준다. 작업이 오래 걸릴 수 있음.
                     simpleNN = package[0]
                     learning_rate = package[1]
