@@ -24,8 +24,8 @@ class dataSet:
         return dataSet(X,Y)
 
     @classmethod
-    def loadDataSet(cls,count):
-        X = WIO.load(count) #(파라미터 수, 데이터 수)
+    def loadDataSet(cls,count,nData):
+        X = WIO.load(count,nData) #(파라미터 수, 데이터 수)
         Y = vt.vectorization(X,count=10)
         print("data load success, data shape = ",X.shape, Y.shape)
         return dataSet(X,Y)

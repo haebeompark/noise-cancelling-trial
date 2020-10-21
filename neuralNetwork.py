@@ -316,4 +316,4 @@ class NeuralNetwork:
         print("   build Complete   ")
         print(" ------------------ ")
         print("lr = ", lr, "\nnumberOfHiddenLayers = ", numberOfHiddenLayers,"\n\n")
-        return [NeuralNetwork.Builder(dataSample, count, numberOfHiddenLayers, output= output), lr]
+        return [NeuralNetwork.Builder(dataSample, count, output = output, numberOfHiddenLayers = numberOfHiddenLayers), lr]

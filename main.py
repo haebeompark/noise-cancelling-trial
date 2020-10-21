@@ -22,13 +22,14 @@ def main():
     nSample = 0
     layerStart = 0
     layerLimit = 8
+    learning_rate = 0
+    simpleNN = 0
 
     while(True):
         userInput = input()
         cds = Decision.userInput(userInput)
         commands = cds.commands
-        learning_rate = 0
-        simpleNN = 0
+        
         # print(cds.noErr)
         # print(commands)
         if cds.noErr:
@@ -57,10 +58,11 @@ def main():
                     layerStart = commands[1]
                     layerLimit = commands[2]
                 if nSample > 0:
-                    package = NeuralNetwork.autoBuilder(trainSet, nSample, layerStart = 0, layerLimit = 8, developmentMode=True)
+                    package = NeuralNetwork.autoBuilder(trainSet, nSample, layerStart = 0, layerLimit = 0, developmentMode=True)
                     # autoBuilder가 learning rate와 hiddenLayer의 수를 알아서 정해준다. 작업이 오래 걸릴 수 있음.
                     simpleNN = package[0]
                     learning_rate = package[1]
+                    print("learning_rate",learning_rate)
                 else:
                     print("  error : please load trainSet first")
                     print("  or create dataSet | use command   createDataSet")
@@ -94,10 +96,10 @@ def main():
                 third = commands[2]
                 count = 100
                 if second == 0: #train
-                    trainSet = dataSet.loadDataSet(count)
+                    trainSet = dataSet.loadDataSet(count,third)
                     nSample = trainSet.X.shape[1]  #batch크기 또는 train set 수
                 elif second == 1: #test
-                    testSet = dataSet.loadDataSet(count)
+                    testSet = dataSet.loadDataSet(count,third)
                
                 print("  | load datsSet complete ")
                 print("  | nSample = ", nSample)
